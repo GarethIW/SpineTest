@@ -1,0 +1,160 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{DA064B16-1E33-4E75-8BB4-18D2D180BB3A}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SpineTest.Mono.Windows</RootNamespace>
+    <AssemblyName>SpineTest.Mono.Windows</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;WINDOWS</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\WindowsGL\Release\</OutputPath>
+    <DefineConstants>TRACE;WINDOWS</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Icon.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\SpineTest\SpineTest\Hero.cs">
+      <Link>Hero.cs</Link>
+    </Compile>
+    <Compile Include="..\SpineTest\SpineTest\SpineTest.cs">
+      <Link>SpineTest.cs</Link>
+    </Compile>
+    <Compile Include="..\SpineTest\SpineTest\Spine\Animation.cs">
+      <Link>Spine\Animation.cs</Link>
+    </Compile>
+    <Compile Include="..\SpineTest\SpineTest\Spine\Atlas.cs">
+      <Link>Spine\Atlas.cs</Link>
+    </Compile>
+    <Compile Include="..\SpineTest\SpineTest\Spine\Attachments\AtlasAttachmentLoader.cs">
+      <Link>Spine\Attachments\AtlasAttachmentLoader.cs</Link>
+    </Compile>
+    <Compile Include="..\SpineTest\SpineTest\Spine\Attachments\Attachment.cs">
+      <Link>Spine\Attachments\Attachment.cs</Link>
+    </Compile>
+    <Compile Include="..\SpineTest\SpineTest\Spine\Attachments\AttachmentLoader.cs">
+      <Link>Spine\Attachments\AttachmentLoader.cs</Link>
+    </Compile>
+    <Compile Include="..\SpineTest\SpineTest\Spine\Attachments\AttachmentType.cs">
+      <Link>Spine\Attachments\AttachmentType.cs</Link>
+    </Compile>
+    <Compile Include="..\SpineTest\SpineTest\Spine\Attachments\RegionAttachment.cs">
+      <Link>Spine\Attachments\RegionAttachment.cs</Link>
+    </Compile>
+    <Compile Include="..\SpineTest\SpineTest\Spine\BaseAtlas.cs">
+      <Link>Spine\BaseAtlas.cs</Link>
+    </Compile>
+    <Compile Include="..\SpineTest\SpineTest\Spine\Bone.cs">
+      <Link>Spine\Bone.cs</Link>
+    </Compile>
+    <Compile Include="..\SpineTest\SpineTest\Spine\BoneData.cs">
+      <Link>Spine\BoneData.cs</Link>
+    </Compile>
+    <Compile Include="..\SpineTest\SpineTest\Spine\Json.cs">
+      <Link>Spine\Json.cs</Link>
+    </Compile>
+    <Compile Include="..\SpineTest\SpineTest\Spine\Skeleton.cs">
+      <Link>Spine\Skeleton.cs</Link>
+    </Compile>
+    <Compile Include="..\SpineTest\SpineTest\Spine\SkeletonData.cs">
+      <Link>Spine\SkeletonData.cs</Link>
+    </Compile>
+    <Compile Include="..\SpineTest\SpineTest\Spine\SkeletonJson.cs">
+      <Link>Spine\SkeletonJson.cs</Link>
+    </Compile>
+    <Compile Include="..\SpineTest\SpineTest\Spine\SkeletonRenderer.cs">
+      <Link>Spine\SkeletonRenderer.cs</Link>
+    </Compile>
+    <Compile Include="..\SpineTest\SpineTest\Spine\Skin.cs">
+      <Link>Spine\Skin.cs</Link>
+    </Compile>
+    <Compile Include="..\SpineTest\SpineTest\Spine\Slot.cs">
+      <Link>Spine\Slot.cs</Link>
+    </Compile>
+    <Compile Include="..\SpineTest\SpineTest\Spine\SlotData.cs">
+      <Link>Spine\SlotData.cs</Link>
+    </Compile>
+    <Compile Include="..\SpineTest\SpineTest\Spine\SpriteBatcher.cs">
+      <Link>Spine\SpriteBatcher.cs</Link>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="MonoGame.Framework, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\MonoGame\MonoGame.Framework\bin\Windows\Debug\MonoGame.Framework.dll</HintPath>
+    </Reference>
+    <Reference Include="Lidgren.Network">
+      <HintPath>$(MSBuildExtensionsPath)\..\MonoGame\v3.0\Assemblies\WindowsGL\Lidgren.Network.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\SpineTest\SpineTest\bin\x86\Debug\Content\spineboy.png">
+      <Link>Content\spineboy.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\SpineTest\SpineTest\bin\x86\Debug\Content\tile.xnb">
+      <Link>Content\tile.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TiledLib.Mono.Windows\TiledLib.Mono.Windows.csproj">
+      <Project>{14ae59fb-38b9-4423-a3ff-3521ed686a33}</Project>
+      <Name>TiledLib.Mono.Windows</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\SpineTest\SpineTest\bin\x86\Debug\Content\blank.xnb">
+      <Link>Content\blank.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\SpineTest\SpineTest\bin\x86\Debug\Content\map.xnb">
+      <Link>Content\map.xnb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\SpineTest\SpineTest\bin\x86\Debug\Content\spineboy.atlas">
+      <Link>Content\spineboy.atlas</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\SpineTest\SpineTest\bin\x86\Debug\Content\spineboy.json">
+      <Link>Content\spineboy.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

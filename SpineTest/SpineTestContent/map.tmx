@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="50" height="50" tilewidth="50" tileheight="50">
+ <tileset firstgid="1" name="tile" tilewidth="50" tileheight="50">
+  <image source="tile.png" width="50" height="50"/>
+ </tileset>
+ <layer name="Tile Layer 1" width="50" height="50">
+  <properties>
+   <property name="Collision" value="On"/>
+  </properties>
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAC+3UMQ7EIAwFUbj/pdNSEMXYxN+geZK7aGGyhNYAAFm6egOb3NRxQ0u0o09GIbL2rEHV413zq+GEDktDds/qWhUbxn1Zn8tsWPndHeurv423PURbFNRn+4/3qD4bEZaOym2r9433v8q+y044V567v1JPdP8MwzDVBgAAAAAA6D0kdZLWECcAAA==
+  </data>
+ </layer>
+</map>
