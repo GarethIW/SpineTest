@@ -451,6 +451,33 @@ namespace TiledLib
             return false;
         }
 
+        public Rectangle? CheckTileCollisionIntersect(Vector2 position, Rectangle rect)
+        {
+            for (int i = 0; i < Layers.Count; i++)
+            {
+                if (!Layers[i].Properties.Contains("Collision"))
+                    continue;
+
+                TileLayer tileLayer = Layers[i] as TileLayer;
+
+                position.X = (int)position.X;
+                position.Y = (int)position.Y;
+
+                Vector2 tilePosition = new Vector2((int)(position.X / TileWidth), (int)(position.Y / TileHeight));
+
+                if (tilePosition.X < 0 || tilePosition.Y < 0 || tilePosition.X > Width - 1 || tilePosition.Y > Height - 1)
+                    continue;
+
+                Tile collisionTile = tileLayer.Tiles[(int)tilePosition.X, (int)tilePosition.Y];
+
+                if (collisionTile == null)
+                    return null;
+                else return Rectangle.Intersect(rect, new Rectangle((int)tilePosition.X * TileWidth, (int)tilePosition.Y * TileHeight, TileWidth, TileHeight));
+            }
+
+            return null;
+        }
+
         public void UnloadContent()
         {
             for(int i=0;i<Tiles.Count;i++)

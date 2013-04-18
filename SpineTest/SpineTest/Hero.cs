@@ -34,6 +34,7 @@ namespace SpineTest
         bool walking = false;
         bool jumping = false;
         bool crouching = false;
+        bool falling = false;
 
         public Hero(Vector2 spawnPosition)
         {
@@ -102,9 +103,10 @@ namespace SpineTest
                 collisionRect.Height = 150;
             }
 
-            Speed += gravity;
-            CheckCollision(gameMap);
+            if(falling)
+                Speed += gravity;
             Position += Speed;
+            CheckCollision(gameMap);
             collisionRect.Location = new Point((int)Position.X - (collisionRect.Width / 2), (int)Position.Y - (collisionRect.Height));
 
             skeleton.RootBone.X = Position.X;
@@ -125,9 +127,9 @@ namespace SpineTest
             skeletonRenderer.End();
 
             // Draw collision box
-            //spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, gameCamera.CameraMatrix);
-            //spriteBatch.Draw(blankTex, collisionRect, Color.White * 0.3f);
-            //spriteBatch.End();
+            spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, gameCamera.CameraMatrix);
+            spriteBatch.Draw(blankTex, collisionRect, Color.White * 0.3f);
+            spriteBatch.End();
         }
 
 
@@ -157,73 +159,112 @@ namespace SpineTest
 
         void CheckCollision(Map gameMap)
         {
-            collisionRect.Offset(new Point((int)Speed.X, (int)Speed.Y));
+            //collisionRect.Offset(new Point((int)Speed.X, (int)Speed.Y));
 
-            if (Speed.Y > 0f)
-                if (CheckCollisionBottom(gameMap))
+            Rectangle? collRect;
+
+            //if (Speed.Y > 0f)
+            //{
+                collRect=CheckCollisionBottom(gameMap);
+                if (collRect.HasValue)
                 {
                     Speed.Y = 0f;
+                    Position.Y -= collRect.Value.Height;
+                    collisionRect.Offset(0, -collRect.Value.Height);
                     jumping = false;
+                    falling = false;
                 }
+                else
+                    falling = true;
+            //}
 
             if (Speed.Y < 0f)
-                if (CheckCollisionTop(gameMap)) Speed.Y = 0f;
+            {
+                collRect=CheckCollisionTop(gameMap);
+                if (collRect.HasValue)
+                {
+                    Speed.Y = 0f;
+                    Position.Y += collRect.Value.Height;
+                    collisionRect.Offset(0, collRect.Value.Height);
+                }
+            }
 
             if (Speed.X > 0f)
-                if (CheckCollisionRight(gameMap)) Speed.X = 0f;
+            {
+                collRect=CheckCollisionRight(gameMap);
+                if (collRect.HasValue)
+                {
+                    Speed.X = 0f;
+                    Position.X -= (collRect.Value.Width+1);
+                    collisionRect.Offset(-(collRect.Value.Width+1),0);
+                }
+            }
             if (Speed.X < 0f)
-                if (CheckCollisionLeft(gameMap)) Speed.X = 0f;
+            {
+                collRect=CheckCollisionLeft(gameMap);
+                if (collRect.HasValue)
+                {
+                    Speed.X = 0f;
+                    Position.X += collRect.Value.Width+1;
+                    collisionRect.Offset(collRect.Value.Width+1, 0);
+                }
+            }
 
 
             bool collided = false;
             for (int y = -1; y > -15; y--)
             {
                 collisionRect.Offset(0, -1);
-                if (CheckCollisionTop(gameMap)) collided = true;
+                collRect = CheckCollisionTop(gameMap);
+                if (collRect.HasValue) collided = true;
             }
             if (!collided) crouching = false;
 
         }
 
-        bool CheckCollisionTop(Map gameMap)
+        Rectangle? CheckCollisionTop(Map gameMap)
         {
-            for (float x = collisionRect.Left + 3; x <= collisionRect.Right-2; x += (collisionRect.Right-2 - collisionRect.Left+3) / 4f)
+            for (float x = collisionRect.Left; x < collisionRect.Right; x += 1)
             {
                 Vector2 checkPos = new Vector2(x, collisionRect.Top);
-                if (gameMap.CheckTileCollision(checkPos)) return true;
+                Rectangle? collRect = gameMap.CheckTileCollisionIntersect(checkPos, collisionRect);
+                if (collRect.HasValue) return collRect;
             }
 
-            return false;
+            return null;
         }
-        bool CheckCollisionBottom(Map gameMap)
+        Rectangle? CheckCollisionBottom(Map gameMap)
         {
-            for (float x = collisionRect.Left + 3; x <= collisionRect.Right-2; x += ((collisionRect.Right-2) - (collisionRect.Left+3)) / 10f)
+            for (float x = collisionRect.Left; x < collisionRect.Right; x += 1)
             {
                 Vector2 checkPos = new Vector2(x, collisionRect.Bottom);
-                if (gameMap.CheckTileCollision(checkPos)) return true;
+                Rectangle? collRect = gameMap.CheckTileCollisionIntersect(checkPos, collisionRect);
+                if (collRect.HasValue) return collRect;
             }
 
-            return false;
+            return null;
         }
-        bool CheckCollisionRight(Map gameMap)
+        Rectangle? CheckCollisionRight(Map gameMap)
         {
-            for (float y = collisionRect.Top; y < collisionRect.Bottom; y += (collisionRect.Bottom - collisionRect.Top) / 10f)
+            for (float y = collisionRect.Top; y < collisionRect.Bottom; y += 1)
             {
                 Vector2 checkPos = new Vector2(collisionRect.Right, y);
-                if (gameMap.CheckTileCollision(checkPos)) return true;
+                Rectangle? collRect = gameMap.CheckTileCollisionIntersect(checkPos, collisionRect);
+                if (collRect.HasValue) return collRect;
             }
 
-            return false;
+            return null;
         }
-        bool CheckCollisionLeft(Map gameMap)
+        Rectangle? CheckCollisionLeft(Map gameMap)
         {
-            for (float y = collisionRect.Top; y < collisionRect.Bottom; y += (collisionRect.Bottom - collisionRect.Top) / 10f)
+            for (float y = collisionRect.Top; y < collisionRect.Bottom; y += 1)
             {
                 Vector2 checkPos = new Vector2(collisionRect.Left, y);
-                if (gameMap.CheckTileCollision(checkPos)) return true;
+                Rectangle? collRect = gameMap.CheckTileCollisionIntersect(checkPos, collisionRect);
+                if (collRect.HasValue) return collRect;
             }
 
-            return false;
+            return null;
         }
     }
 }
