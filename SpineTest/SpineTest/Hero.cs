@@ -18,7 +18,7 @@ namespace SpineTest
 
         Vector2 gravity = new Vector2(0f, 0.25f);
 
-        Rectangle collisionRect = new Rectangle(0, 0, 75, 150);
+        Rectangle collisionRect = new Rectangle(0, 0, 75, 130);
 
         Texture2D blankTex;
 
@@ -88,7 +88,7 @@ namespace SpineTest
 
             if (crouching && !jumping)
             {
-                collisionRect.Width = 120;
+                collisionRect.Width = 100;
                 collisionRect.Height = 96;
 
                 if (!walking)
@@ -100,14 +100,14 @@ namespace SpineTest
             else
             {
                 collisionRect.Width = 75;
-                collisionRect.Height = 150;
+                collisionRect.Height = 130;
             }
 
             if(falling)
                 Speed += gravity;
             Position += Speed;
-            CheckCollision(gameMap);
             collisionRect.Location = new Point((int)Position.X - (collisionRect.Width / 2), (int)Position.Y - (collisionRect.Height));
+            CheckCollision(gameMap);
 
             skeleton.RootBone.X = Position.X;
             skeleton.RootBone.Y = Position.Y;
@@ -127,9 +127,9 @@ namespace SpineTest
             skeletonRenderer.End();
 
             // Draw collision box
-            spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, gameCamera.CameraMatrix);
-            spriteBatch.Draw(blankTex, collisionRect, Color.White * 0.3f);
-            spriteBatch.End();
+            //spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, gameCamera.CameraMatrix);
+            //spriteBatch.Draw(blankTex, collisionRect, Color.White * 0.3f);
+            //spriteBatch.End();
         }
 
 
@@ -186,6 +186,7 @@ namespace SpineTest
                     Speed.Y = 0f;
                     Position.Y += collRect.Value.Height;
                     collisionRect.Offset(0, collRect.Value.Height);
+                    falling = true;
                 }
             }
 
@@ -195,8 +196,7 @@ namespace SpineTest
                 if (collRect.HasValue)
                 {
                     Speed.X = 0f;
-                    Position.X -= (collRect.Value.Width+1);
-                    collisionRect.Offset(-(collRect.Value.Width+1),0);
+                    Position.X -= (collRect.Value.Width);
                 }
             }
             if (Speed.X < 0f)
@@ -205,8 +205,7 @@ namespace SpineTest
                 if (collRect.HasValue)
                 {
                     Speed.X = 0f;
-                    Position.X += collRect.Value.Width+1;
-                    collisionRect.Offset(collRect.Value.Width+1, 0);
+                    Position.X += collRect.Value.Width;
                 }
             }
 
@@ -224,7 +223,7 @@ namespace SpineTest
 
         Rectangle? CheckCollisionTop(Map gameMap)
         {
-            for (float x = collisionRect.Left; x < collisionRect.Right; x += 1)
+            for (float x = collisionRect.Left+5; x < collisionRect.Right-5; x += 1)
             {
                 Vector2 checkPos = new Vector2(x, collisionRect.Top);
                 Rectangle? collRect = gameMap.CheckTileCollisionIntersect(checkPos, collisionRect);
@@ -235,7 +234,7 @@ namespace SpineTest
         }
         Rectangle? CheckCollisionBottom(Map gameMap)
         {
-            for (float x = collisionRect.Left; x < collisionRect.Right; x += 1)
+            for (float x = collisionRect.Left+5; x < collisionRect.Right-5; x += 1)
             {
                 Vector2 checkPos = new Vector2(x, collisionRect.Bottom);
                 Rectangle? collRect = gameMap.CheckTileCollisionIntersect(checkPos, collisionRect);
