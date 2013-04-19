@@ -9,9 +9,7 @@ The solution contains a standard XNA project as well as a Monogame Windows (Dire
 
 I have included the Monogame DLLs that I used, you should be able to resolve missing references with them.
 
-The Spine animations used are the two default SpineBoy anims (Walk, Jump) as well as a quick Crawl anim that I knocked together (I am not an animator!). The jumping anim doesn't look too good, especially when it gets interrupted. Hoping someone might have a stab at fixing that!
-
-I'm also not happy with the collision detection. I've never been too hot with tile-based collisions and there's some rough edges in there. It would be *awesome* if someone could show me how it's done :D
+The Spine animations used are the two default SpineBoy anims (Walk, Jump) as well as a quick Crawl anim that I knocked together (I am not an animator!).
 
 Tweet me @garethiw.
 
