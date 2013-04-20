@@ -27,6 +27,9 @@ namespace SpineTest
         Animation walkAnimation;
         Animation jumpAnimation;
         Animation crawlAnimation;
+        Animation fallAnimation;
+        Animation grabAnimation;
+        Animation climbAnimation;
         float animTime;
 
         int faceDir = 1;
@@ -35,6 +38,12 @@ namespace SpineTest
         bool jumping = false;
         bool crouching = false;
         bool falling = false;
+        bool grabbed = false;
+        bool climbing = false;
+
+        bool justUngrabbed = false;
+
+        Vector2 grabbedPosition;
 
         public Hero(Vector2 spawnPosition)
         {
@@ -54,6 +63,9 @@ namespace SpineTest
             walkAnimation = skeleton.Data.FindAnimation("walk");
             jumpAnimation = skeleton.Data.FindAnimation("jump");
             crawlAnimation = skeleton.Data.FindAnimation("crawl");
+            fallAnimation = skeleton.Data.FindAnimation("fall");
+            grabAnimation = skeleton.Data.FindAnimation("grab");
+            climbAnimation = skeleton.Data.FindAnimation("climb");
 
             skeleton.RootBone.X = Position.X;
             skeleton.RootBone.Y = Position.Y;
@@ -62,12 +74,12 @@ namespace SpineTest
 
         public void Update(GameTime gameTime, Camera gameCamera, Map gameMap)
         {
-            if (!walking && !jumping && !crouching)
+            if (!walking && !jumping && !crouching && !grabbed)
             {
                 skeleton.SetToBindPose();
             }
 
-            if (walking && !jumping)
+            if (walking && !jumping && !grabbed)
             {
                 animTime += gameTime.ElapsedGameTime.Milliseconds / 1000f;
                 if (!crouching)
@@ -103,14 +115,44 @@ namespace SpineTest
                 collisionRect.Height = 130;
             }
 
-            if(falling)
+            if (falling)
+            {
                 Speed += gravity;
+
+                if (Speed.Y > 1)
+                {
+                    animTime += gameTime.ElapsedGameTime.Milliseconds / 1000f;
+                    fallAnimation.Mix(skeleton, animTime, true, 0.75f);
+                }
+            }
+
+            if (grabbed)
+            {
+                Position = Vector2.Lerp(Position, grabbedPosition, 0.1f);
+                animTime += gameTime.ElapsedGameTime.Milliseconds / 1000f;
+                grabAnimation.Mix(skeleton, animTime, true, 0.3f);
+            }
+
+            if (climbing)
+            {
+                //Position = Vector2.Lerp(Position, grabbedPosition, 0.1f);
+                animTime += gameTime.ElapsedGameTime.Milliseconds / 500f;
+                climbAnimation.Apply(skeleton, animTime, false);
+
+                Position = Vector2.Lerp(Position, grabbedPosition - new Vector2(20*(-faceDir), 155), (0.07f/grabAnimation.Duration) * animTime);
+
+                if ((Position - (grabbedPosition - new Vector2(20 * (-faceDir), 155))).Length() < 5f)
+                    climbing = false;
+            }
+
             Position += Speed;
             collisionRect.Location = new Point((int)Position.X - (collisionRect.Width / 2), (int)Position.Y - (collisionRect.Height));
             CheckCollision(gameMap);
 
+            
             skeleton.RootBone.X = Position.X;
             skeleton.RootBone.Y = Position.Y;
+    
 
             if (faceDir == -1) skeleton.FlipX = true; else skeleton.FlipX = false;
 
@@ -135,6 +177,7 @@ namespace SpineTest
 
         public void MoveLeftRight(float dir)
         {
+            if (grabbed || climbing) return;
             if (dir > 0) faceDir = 1; else faceDir = -1;
 
             Speed.X = dir * 4f;
@@ -144,7 +187,15 @@ namespace SpineTest
 
         public void Jump()
         {
-            if (!jumping && !crouching)
+            if (grabbed && (Position - grabbedPosition).Length()<5f)
+            {
+                climbing = true;
+                grabbed = false;
+                animTime = 0;
+                return;
+            }
+
+            if (!jumping && !crouching && !falling && !climbing && !grabbed)
             {
                 jumping = true;
                 animTime = 0;
@@ -154,7 +205,15 @@ namespace SpineTest
 
         public void Crouch()
         {
-            crouching = true;
+            if (grabbed)
+            {
+                grabbed = false;
+                falling = true;
+                justUngrabbed = true;
+                Position.X += (-faceDir * 40f);
+            }
+            else
+                if(!falling && !climbing && !justUngrabbed) crouching = true;
         }
 
         void CheckCollision(Map gameMap)
@@ -163,49 +222,95 @@ namespace SpineTest
 
             Rectangle? collRect;
 
-            //if (Speed.Y > 0f)
-            //{
-                collRect=CheckCollisionBottom(gameMap);
+            // Check for ledge grabs
+            if ((jumping || falling) && !justUngrabbed)
+            {
+                if (Speed.X<0 && gameMap.CheckTileCollision(new Vector2(collisionRect.Left, collisionRect.Top)))
+                    if (!gameMap.CheckTileCollision(new Vector2(collisionRect.Left, collisionRect.Top - 50)) &&
+                       !gameMap.CheckTileCollision(new Vector2(collisionRect.Left + 50, collisionRect.Top - 50)) &&
+                       !gameMap.CheckTileCollision(new Vector2(collisionRect.Left + 50, collisionRect.Top)))
+                    {
+                        grabbed = true;
+                        jumping = false;
+                        falling = false;
+                        crouching = false;
+                        Speed.Y = 0;
+                        Speed.X = 0;
+                        grabbedPosition = new Vector2((int)(collisionRect.Left / gameMap.TileWidth) * gameMap.TileWidth, (int)(collisionRect.Top / gameMap.TileHeight) * gameMap.TileWidth) + new Vector2(50, 150);
+                        faceDir = -1;
+                    }
+
+                if (Speed.X>0 && gameMap.CheckTileCollision(new Vector2(collisionRect.Right, collisionRect.Top)))
+                    if (!gameMap.CheckTileCollision(new Vector2(collisionRect.Right, collisionRect.Top - 50)) &&
+                       !gameMap.CheckTileCollision(new Vector2(collisionRect.Right - 50, collisionRect.Top - 50)) &&
+                       !gameMap.CheckTileCollision(new Vector2(collisionRect.Right - 50, collisionRect.Top)))
+                    {
+                        grabbed = true;
+                        jumping = false;
+                        falling = false;
+                        crouching = false;
+                        Speed.Y = 0;
+                        Speed.X = 0;
+                        grabbedPosition = new Vector2((int)(collisionRect.Right / gameMap.TileWidth) * gameMap.TileWidth, (int)(collisionRect.Top / gameMap.TileHeight) * gameMap.TileWidth) + new Vector2(0, 150);
+                        faceDir = 1;
+                    }
+            }
+
+            if (grabbed || climbing) return;
+
+
+            
+                collRect = CheckCollisionBottom(gameMap);
                 if (collRect.HasValue)
                 {
-                    Speed.Y = 0f;
-                    Position.Y -= collRect.Value.Height;
-                    collisionRect.Offset(0, -collRect.Value.Height);
-                    jumping = false;
-                    falling = false;
+                    if (falling)
+                    {
+                        Speed.Y = 0f;
+                        Position.Y -= collRect.Value.Height;
+                        collisionRect.Offset(0, -collRect.Value.Height);
+                        jumping = false;
+                        falling = false;
+                        justUngrabbed = false;
+                    }
+                    
                 }
                 else
                     falling = true;
-            //}
 
-            if (Speed.Y < 0f)
-            {
-                collRect=CheckCollisionTop(gameMap);
-                if (collRect.HasValue)
+                if (Speed.Y < 0f)
                 {
-                    Speed.Y = 0f;
-                    Position.Y += collRect.Value.Height;
-                    collisionRect.Offset(0, collRect.Value.Height);
-                    falling = true;
+                    collRect = CheckCollisionTop(gameMap);
+                    if (collRect.HasValue)
+                    {
+                        Speed.Y = 0f;
+                        Position.Y += collRect.Value.Height;
+                        collisionRect.Offset(justUngrabbed ? (collRect.Value.Width * (-faceDir)) : 0, collRect.Value.Height);
+                        falling = true;
+                        jumping = false;
+                    }
                 }
-            }
+            
+            
+            
 
             if (Speed.X > 0f)
             {
-                collRect=CheckCollisionRight(gameMap);
+                collRect = CheckCollisionRight(gameMap);
                 if (collRect.HasValue)
                 {
                     Speed.X = 0f;
                     Position.X -= (collRect.Value.Width);
+                    collisionRect.Offset(-collRect.Value.Width, 0);
                 }
             }
             if (Speed.X < 0f)
             {
-                collRect=CheckCollisionLeft(gameMap);
+                collRect = CheckCollisionLeft(gameMap);
                 if (collRect.HasValue)
                 {
                     Speed.X = 0f;
                     Position.X += collRect.Value.Width;
+                    collisionRect.Offset(collRect.Value.Width, 0);
                 }
             }
 
